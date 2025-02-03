@@ -37,14 +37,12 @@ public class EmployeeServiceTest {
     private List<Employee> mockEmployeeList;
     private Employee mockEmployeeInput;
     private String searchString;
-    private String invalidSearchString;
 
     @BeforeEach
     void setUp() {
         validEmployeeId = "f9050d09-7366-48a6-b6fd-88c583c1cdd0";
         invalidEmployeeId = "456";
         searchString = "Doe";
-        invalidSearchString = "Dee";
         mockEmployeeDetails = new EmployeeDetails();
 
         mockEmployeeList = Arrays.asList(

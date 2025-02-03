@@ -60,7 +60,7 @@ public class EmployeeService implements IEmployeeService{
             logger.error("EmployeeService - getAllEmployees() - Too many requests: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }catch (Exception e) {
-            logger.error("EmployeeService - getAllEmployees() - Unexpected error while fetching employees: {}", e.getMessage());
+            logger.error("EmployeeService - getAllEmployees() - Unexpected error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -93,7 +93,7 @@ public class EmployeeService implements IEmployeeService{
             logger.error("EmployeeService - getEmployeesByNameSearch() - Too many requests: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }catch (Exception e) {
-            logger.error("EmployeeService - getEmployeesByNameSearch() - Unexpected error while fetching employees: {}", e.getMessage());
+            logger.error("EmployeeService - getEmployeesByNameSearch() - Unexpected error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -112,7 +112,7 @@ public class EmployeeService implements IEmployeeService{
             logger.error("EmployeeService - getEmployeeById() - Too many requests: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }catch (Exception e) {
-            logger.error("EmployeeService - getEmployeeById() - Unexpected error while fetching employees: {}", e.getMessage());
+            logger.error("EmployeeService - getEmployeeById() - Unexpected error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -139,7 +139,7 @@ public class EmployeeService implements IEmployeeService{
             logger.error("EmployeeService - getHighestSalaryOfEmployees() - Too many requests: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }catch (Exception e) {
-            logger.error("EmployeeService - getHighestSalaryOfEmployees() - Unexpected error while fetching employee with highest salary: {}", e.getMessage());
+            logger.error("EmployeeService - getHighestSalaryOfEmployees() - Unexpected error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -169,7 +169,7 @@ public class EmployeeService implements IEmployeeService{
             logger.error("EmployeeService - getTopTenHighestEarningEmployeeNames() - Too many requests: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }catch (Exception e) {
-            logger.error("EmployeeService - getTopTenHighestEarningEmployeeNames() - Unexpected error while fetching employees: {}", e.getMessage());
+            logger.error("EmployeeService - getTopTenHighestEarningEmployeeNames() - Unexpected error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
@@ -191,7 +191,7 @@ public class EmployeeService implements IEmployeeService{
             logger.error("EmployeeService - createEmployee() - Too many requests: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }catch (Exception e) {
-            logger.error("EmployeeService - createEmployee() - Unexpected error while creating employee: {}", e.getMessage());
+            logger.error("EmployeeService - createEmployee() - Unexpected error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
@@ -216,7 +216,7 @@ public class EmployeeService implements IEmployeeService{
             logger.error("EmployeeService - deleteEmployeeById() - Too many requests: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }catch (Exception e) {
-            logger.error("EmployeeService - deleteEmployeeById() - Unexpected error while deleting the employee: {}", e.getMessage());
+            logger.error("EmployeeService - deleteEmployeeById() - Unexpected error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
