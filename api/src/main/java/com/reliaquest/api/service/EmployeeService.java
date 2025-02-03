@@ -26,6 +26,7 @@ import static com.reliaquest.api.constant.EmployeeConstant.API_ENDPOINT_BY_ID;
 import static com.reliaquest.api.constant.EmployeeConstant.API_ENDPOINT_NAME;
 
 @Service
+
 public class EmployeeService implements IEmployeeService{
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
