@@ -29,40 +29,36 @@ public class EmployeeServiceTest {
     @InjectMocks
     private EmployeeService employeeService;
 
-    private String validId;
-    private String invalidId;
-    private String apiUrl;
+    private static final String API_PATH = "/api/v1/employee";
+
+    private String validEmployeeId;
+    private String invalidEmployeeId;
     private EmployeeDetails mockEmployeeDetails;
-    private String employeeId;
-    private List<Employee> mockEmployees;
+    private List<Employee> mockEmployeeList;
     private Employee mockEmployeeInput;
-    private String url;
     private String searchString;
-    private String searchApiUrl;
+    private String invalidSearchString;
 
     @BeforeEach
     void setUp() {
-        validId = "123";
-        invalidId = "456";
-        apiUrl = "http://localhost:8080/api/v1/employee/" + validId;
-        employeeId = "550e8400-e29b-41d4-a716-446655440000";
-        url = "/api/v1/employee";
-        searchApiUrl = "/api/v1/employee/";
+        validEmployeeId = "f9050d09-7366-48a6-b6fd-88c583c1cdd0";
+        invalidEmployeeId = "456";
         searchString = "Doe";
+        invalidSearchString = "Dee";
         mockEmployeeDetails = new EmployeeDetails();
-        mockEmployees = Arrays.asList(
-                new Employee(UUID.fromString(employeeId), "John Doe", 80000, 30, "Engineer", "john@example.com"),
-                new Employee(UUID.fromString(employeeId), "Jane Doe", 90000, 28, "Manager", "jane@example.com")
-        );
-        mockEmployeeInput = new Employee(UUID.fromString(employeeId), "John Doe", 90000, 30, "Software Engineer", "johndoe@example.com");
-        mockEmployeeDetails.setData(new Employee(UUID.fromString(employeeId), "John Doe", 90000, 30, "Software Engineer", "johndoe@example.com"));
+
+        mockEmployeeList = Arrays.asList(
+                new Employee(UUID.fromString(validEmployeeId), "John Doe", 80000, 30, "Engineer", "john@example.com"),
+                new Employee(UUID.fromString(validEmployeeId), "Jane Doe", 90000, 28, "Manager", "jane@example.com"));
+        mockEmployeeInput = new Employee(UUID.fromString(validEmployeeId), "John Doe", 90000, 30, "Software Engineer", "johndoe@example.com");
+        mockEmployeeDetails.setData(new Employee(UUID.fromString(validEmployeeId), "John Doe", 90000, 30, "Software Engineer", "johndoe@example.com"));
     }
 
     @Test
     void testGetAllEmployees_Success() {
         EmployeeResponse employeeResponse = new EmployeeResponse();
-        employeeResponse.setData(mockEmployees);
-        when(restTemplate.getForObject(url, EmployeeResponse.class)).thenReturn(employeeResponse);
+        employeeResponse.setData(mockEmployeeList);
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class)).thenReturn(employeeResponse);
         ResponseEntity<List<Employee>> response = employeeService.getAllEmployees();
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -73,7 +69,7 @@ public class EmployeeServiceTest {
     void testGetAllEmployees_NoContent() {
         EmployeeResponse emptyEmployeeResponse = new EmployeeResponse();
         emptyEmployeeResponse.setData(Collections.emptyList());
-        when(restTemplate.getForObject(url, EmployeeResponse.class)).thenReturn(emptyEmployeeResponse);
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class)).thenReturn(emptyEmployeeResponse);
         ResponseEntity<List<Employee>> response = employeeService.getAllEmployees();
         assertNotNull(response);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
@@ -82,7 +78,7 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetAllEmployees_TooManyRequests() {
-        when(restTemplate.getForObject(url, EmployeeResponse.class))
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class))
                 .thenThrow(new HttpServerErrorException(HttpStatus.TOO_MANY_REQUESTS));
         ResponseEntity<List<Employee>> response = employeeService.getAllEmployees();
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode());
@@ -91,7 +87,7 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetAllEmployees_InternalServerError() {
-        when(restTemplate.getForObject(url, EmployeeResponse.class))
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class))
                 .thenThrow(new RuntimeException("Internal Server Error"));
         ResponseEntity<List<Employee>> response = employeeService.getAllEmployees();
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
@@ -101,8 +97,8 @@ public class EmployeeServiceTest {
     @Test
     void testGetEmployeesByNameSearch_Success() {
         EmployeeResponse employeeResponse = new EmployeeResponse();
-        employeeResponse.setData(mockEmployees);
-        when(restTemplate.getForObject(url, EmployeeResponse.class)).thenReturn(employeeResponse);
+        employeeResponse.setData(mockEmployeeList);
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class)).thenReturn(employeeResponse);
         ResponseEntity<List<Employee>> response = employeeService.getEmployeesByNameSearch(searchString);
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -113,9 +109,9 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetEmployeesByNameSearch_NoMatches() {
-        EmployeeResponse employeeResponse = new EmployeeResponse();
-        employeeResponse.setData(mockEmployees);
-        when(restTemplate.getForObject(searchApiUrl, EmployeeResponse.class)).thenReturn(employeeResponse);
+        EmployeeResponse emptyEmployeeResponse = new EmployeeResponse();
+        emptyEmployeeResponse.setData(mockEmployeeList);
+        when(restTemplate.getForObject(API_PATH + "/", EmployeeResponse.class)).thenReturn(emptyEmployeeResponse);
         ResponseEntity<List<Employee>> response = employeeService.getEmployeesByNameSearch(searchString);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
@@ -123,27 +119,27 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetEmployeesByNameSearch_EmptyEmployeeList() {
-        EmployeeResponse emptyResponse = new EmployeeResponse();
-        emptyResponse.setData(Collections.emptyList());
-        when(restTemplate.getForObject(url, EmployeeResponse.class)).thenReturn(emptyResponse);
-        ResponseEntity<List<Employee>> response = employeeService.getEmployeesByNameSearch("Doe");
+        EmployeeResponse emptyEmployeeResponse = new EmployeeResponse();
+        emptyEmployeeResponse.setData(Collections.emptyList());
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class)).thenReturn(emptyEmployeeResponse);
+        ResponseEntity<List<Employee>> response = employeeService.getEmployeesByNameSearch(searchString);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     void testGetEmployeesByNameSearch_TooManyRequests() {
-        when(restTemplate.getForObject(url, EmployeeResponse.class))
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class))
                 .thenThrow(new HttpServerErrorException(HttpStatus.TOO_MANY_REQUESTS));
-        ResponseEntity<List<Employee>> response = employeeService.getEmployeesByNameSearch("Doe");
+        ResponseEntity<List<Employee>> response = employeeService.getEmployeesByNameSearch(searchString);
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     public void testGetEmployeeById_Success() {
-        when(restTemplate.getForObject( searchApiUrl + employeeId, EmployeeDetails.class)).thenReturn(mockEmployeeDetails);
-        ResponseEntity<Employee> response = employeeService.getEmployeeById(employeeId);
+        when(restTemplate.getForObject( API_PATH + "/" + validEmployeeId, EmployeeDetails.class)).thenReturn(mockEmployeeDetails);
+        ResponseEntity<Employee> response = employeeService.getEmployeeById(validEmployeeId);
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -153,18 +149,18 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetEmployeeById_InternalServerError() {
-        when(restTemplate.getForObject(url + employeeId, EmployeeDetails.class))
+        when(restTemplate.getForObject(API_PATH + "/" + validEmployeeId, EmployeeDetails.class))
                 .thenThrow(new RuntimeException("Internal Server Error"));
-        ResponseEntity<Employee> response = employeeService.getEmployeeById(employeeId);
+        ResponseEntity<Employee> response = employeeService.getEmployeeById(validEmployeeId);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     void testGetHighestSalaryOfEmployees_NoContent() {
-        EmployeeResponse employeeResponse = new EmployeeResponse();
-        employeeResponse.setData(Collections.emptyList());
-        when(restTemplate.getForObject(url, EmployeeResponse.class)).thenReturn(employeeResponse);
+        EmployeeResponse employeeEmployeeResponse = new EmployeeResponse();
+        employeeEmployeeResponse.setData(Collections.emptyList());
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class)).thenReturn(employeeEmployeeResponse);
         ResponseEntity<Integer> response = employeeService.getHighestSalaryOfEmployees();
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
@@ -172,7 +168,7 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetHighestSalaryOfEmployees_TooManyRequests() {
-        when(restTemplate.getForObject(url, EmployeeResponse.class))
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class))
                 .thenThrow(new HttpServerErrorException(HttpStatus.TOO_MANY_REQUESTS));
         ResponseEntity<Integer> response = employeeService.getHighestSalaryOfEmployees();
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode());
@@ -181,7 +177,7 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetHighestSalaryOfEmployees_InternalServerError() {
-        when(restTemplate.getForObject(url, EmployeeResponse.class))
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class))
                 .thenThrow(new RuntimeException("Internal Server Error"));
         ResponseEntity<Integer> response = employeeService.getHighestSalaryOfEmployees();
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
@@ -190,15 +186,15 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetTopTenHighestEarningEmployeeNames_Success() {
-        List<String> expectedTopTenNames = mockEmployees.stream()
+        List<String> expectedTopTenNames = mockEmployeeList.stream()
                 .sorted(Comparator.comparing(Employee::getSalary).reversed())
                 .limit(10)
                 .map(Employee::getName)
                 .collect(Collectors.toList());
 
         EmployeeResponse employeeResponse = new EmployeeResponse();
-        employeeResponse.setData(mockEmployees);
-        when(restTemplate.getForObject(url, EmployeeResponse.class)).thenReturn(employeeResponse);
+        employeeResponse.setData(mockEmployeeList);
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class)).thenReturn(employeeResponse);
         ResponseEntity<List<String>> response = employeeService.getTopTenHighestEarningEmployeeNames();
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -207,9 +203,9 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetTopTenHighestEarningEmployeeNames_NoContent() {
-        EmployeeResponse emptyResponse = new EmployeeResponse();
-        emptyResponse.setData(Collections.emptyList());
-        when(restTemplate.getForObject(url, EmployeeResponse.class)).thenReturn(emptyResponse);
+        EmployeeResponse emptyEmployeeResponse = new EmployeeResponse();
+        emptyEmployeeResponse.setData(Collections.emptyList());
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class)).thenReturn(emptyEmployeeResponse);
         ResponseEntity<List<String>> response = employeeService.getTopTenHighestEarningEmployeeNames();
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
@@ -217,7 +213,7 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetTopTenHighestEarningEmployeeNames_TooManyRequests() {
-        when(restTemplate.getForObject(url, EmployeeResponse.class))
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class))
                 .thenThrow(new HttpServerErrorException(HttpStatus.TOO_MANY_REQUESTS));
         ResponseEntity<List<String>> response = employeeService.getTopTenHighestEarningEmployeeNames();
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode());
@@ -226,7 +222,7 @@ public class EmployeeServiceTest {
 
     @Test
     void testGetTopTenHighestEarningEmployeeNames_InternalServerError() {
-        when(restTemplate.getForObject(url, EmployeeResponse.class))
+        when(restTemplate.getForObject(API_PATH, EmployeeResponse.class))
                 .thenThrow(new RuntimeException("Internal Server Error"));
         ResponseEntity<List<String>> response = employeeService.getTopTenHighestEarningEmployeeNames();
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
@@ -237,7 +233,7 @@ public class EmployeeServiceTest {
     void testCreateEmployee_Success() {
         EmployeeDetails employeeDetails = new EmployeeDetails();
         employeeDetails.setData(mockEmployeeInput);
-        when(restTemplate.postForObject(url, mockEmployeeInput, EmployeeDetails.class)).thenReturn(employeeDetails);
+        when(restTemplate.postForObject(API_PATH, mockEmployeeInput, EmployeeDetails.class)).thenReturn(employeeDetails);
         ResponseEntity<Employee> response = employeeService.createEmployee(mockEmployeeInput);
         assertNotNull(response);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -246,7 +242,7 @@ public class EmployeeServiceTest {
 
     @Test
     void testCreateEmployee_NoContent() {
-        when(restTemplate.postForObject(url, mockEmployeeInput, EmployeeDetails.class)).thenReturn(null);
+        when(restTemplate.postForObject(API_PATH, mockEmployeeInput, EmployeeDetails.class)).thenReturn(null);
         ResponseEntity<Employee> response = employeeService.createEmployee(mockEmployeeInput);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
@@ -254,7 +250,7 @@ public class EmployeeServiceTest {
 
     @Test
     void testCreateEmployee_TooManyRequests() {
-        when(restTemplate.postForObject(url, mockEmployeeInput, EmployeeDetails.class))
+        when(restTemplate.postForObject(API_PATH, mockEmployeeInput, EmployeeDetails.class))
                 .thenThrow(new HttpServerErrorException(HttpStatus.TOO_MANY_REQUESTS));
         ResponseEntity<Employee> response = employeeService.createEmployee(mockEmployeeInput);
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode());
@@ -263,7 +259,7 @@ public class EmployeeServiceTest {
 
     @Test
     void testCreateEmployee_InternalServerError() {
-        when(restTemplate.postForObject(url, mockEmployeeInput, EmployeeDetails.class))
+        when(restTemplate.postForObject(API_PATH, mockEmployeeInput, EmployeeDetails.class))
                 .thenThrow(new RuntimeException("Internal Server Error"));
         ResponseEntity<Employee> response = employeeService.createEmployee(mockEmployeeInput);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
@@ -272,27 +268,27 @@ public class EmployeeServiceTest {
 
     @Test
     void testDeleteEmployeeById_NotFound() {
-        when(restTemplate.getForObject(searchApiUrl + employeeId, EmployeeDetails.class))
+        when(restTemplate.getForObject(API_PATH + "/" + invalidEmployeeId, EmployeeDetails.class))
                 .thenReturn(null);
-        ResponseEntity<String> response = employeeService.deleteEmployeeById(employeeId);
+        ResponseEntity<String> response = employeeService.deleteEmployeeById(invalidEmployeeId);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     void testDeleteEmployeeById_TooManyRequests() {
-        when(restTemplate.getForObject(searchApiUrl + employeeId, EmployeeDetails.class))
+        when(restTemplate.getForObject(API_PATH + "/" + validEmployeeId, EmployeeDetails.class))
                 .thenThrow(new HttpServerErrorException(HttpStatus.TOO_MANY_REQUESTS));
-        ResponseEntity<String> response = employeeService.deleteEmployeeById(employeeId);
+        ResponseEntity<String> response = employeeService.deleteEmployeeById(validEmployeeId);
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     void testDeleteEmployeeById_InternalServerError() {
-        when(restTemplate.getForObject(searchApiUrl + employeeId, EmployeeDetails.class))
+        when(restTemplate.getForObject(API_PATH + "/" + validEmployeeId, EmployeeDetails.class))
                 .thenThrow(new RuntimeException("Internal Server Error"));
-        ResponseEntity<String> response = employeeService.deleteEmployeeById(employeeId);
+        ResponseEntity<String> response = employeeService.deleteEmployeeById(validEmployeeId);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
     }
