@@ -29,9 +29,13 @@ import static com.reliaquest.api.constant.EmployeeConstant.API_ENDPOINT_NAME;
 public class EmployeeService implements IEmployeeService{
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+    private RestTemplate restTemplate;
 
     @Autowired
-    private RestTemplate restTemplate;
+    public EmployeeService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
 
     @Value("${employee.service.url}")
     private String employeeServiceURL = "";

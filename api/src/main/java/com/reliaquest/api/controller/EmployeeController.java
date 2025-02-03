@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.*;
 public class EmployeeController implements IEmployeeController {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+    private IEmployeeService employeeService;
 
     @Autowired
-    IEmployeeService employeeService;
+    public EmployeeController(IEmployeeService employeeService){
+        this.employeeService=employeeService;
+    }
 
     @Override
     @GetMapping()
